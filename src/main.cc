@@ -103,6 +103,21 @@ void initSecondaries(Aktualizr *aktualizr, const boost::filesystem::path& config
   }
 }
 
+// This function is to exec a command in terminal as using system() but returning the result as a string
+std::string exec(const char* cmd) {
+    std::array<char, 128> buffer;
+    std::string result;
+    std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd, "r"), pclose);
+    if (!pipe) {
+        throw std::runtime_error("popen() failed!");
+    }
+    while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
+        result += buffer.data();
+    }
+    return result;
+}
+
+
 int main(int argc, char *argv[]) {
   logger_init();
   logger_set_threshold(boost::log::trivial::info);
@@ -134,6 +149,13 @@ int main(int argc, char *argv[]) {
 
     std::vector<Uptane::Target> current_updates;
     std::string buffer;
+    
+    std::string hashfirmwarevirtual_old;
+    std::string hashfirmwarevirtual_new;
+    std::string hashfirmwarearduino_old;
+    std::string hashfirmwarearduino_new;
+    
+    
     while (std::getline(std::cin, buffer)) {
       std::vector<std::string> words;
       boost::algorithm::split(words, buffer, boost::is_any_of("\t "), boost::token_compress_on);
@@ -147,8 +169,23 @@ int main(int argc, char *argv[]) {
       } else if (command == "download") {
         aktualizr.Download(current_updates).get();
       } else if (command == "install") {
+        // Compute the hash of old firmware and see if changes after installation
+        hashfirmwarearduino_old = exec("md5sum /var/sota/arduino-usb/firmware-arduino.bin");
+        
         aktualizr.Install(current_updates).get();
         current_updates.clear();
+        
+        hashfirmwarearduino_new = exec("md5sum /var/sota/arduino-usb/firmware-arduino.bin");
+        
+        // If change occurs, automatically start installation of firmware in the secondary
+        if (hashfirmwarearduino_old == hashfirmwarearduino_new) {
+            std::cout << "No updates for Arduino secondary to be installed" << std::endl;
+        }
+        else {
+            std::cout << "Starting installation for Arduino secondary...\n" << std::endl;
+            system("avrdude -v -p atmega328p -c arduino -P /dev/ttyACM0 -b 115200 -D -U flash:w:/var/sota/arduino-usb//firmware-arduino.bin:i");
+            std::cout << "\nInstallation completed for Arduino secondary" << std::endl;
+        }       
       } else if (command == "campaigncheck") {
         aktualizr.CampaignCheck().get();
       } else if (command == "campaignaccept") {

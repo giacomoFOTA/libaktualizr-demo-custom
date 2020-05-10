@@ -144,7 +144,7 @@ int main(int argc, char *argv[]) {
 
     aktualizr.Initialize();
 
-    const char *cmd_list = "Available commands: SendDeviceData, CheckUpdates, Download, Install, CampaignCheck, CampaignAccept, SecArduinoInstall, Pause, Resume, Abort";
+    const char *cmd_list = "Available commands: SendDeviceData, CheckUpdates, Download, Install, CampaignCheck, CampaignAccept, SecArduinoInstall, FullUpdateCycle, Pause, Resume, Abort";
     std::cout << cmd_list << std::endl;
 
     std::vector<Uptane::Target> current_updates;
@@ -185,7 +185,11 @@ int main(int argc, char *argv[]) {
             std::cout << "Starting installation for Arduino secondary...\n" << std::endl;
             system("avrdude -v -p atmega328p -c arduino -P /dev/ttyACM0 -b 115200 -D -U flash:w:/var/sota/arduino-usb//firmware-arduino.bin:i");
             std::cout << "\nInstallation completed for Arduino secondary" << std::endl;
-        }       
+        }
+        
+        // Force to check again for updates, since otherwise the update procedure is not complete on server side
+        auto result = aktualizr.CheckUpdates().get();
+        current_updates = result.updates;       
       } else if (command == "campaigncheck") {
         aktualizr.CampaignCheck().get();
       } else if (command == "campaignaccept") {
@@ -198,6 +202,33 @@ int main(int argc, char *argv[]) {
         std::cout << "Starting flash for Arduino with AVRdude\n\n\n";
         system("avrdude -v -p atmega328p -c arduino -P /dev/ttyACM0 -b 115200 -D -U flash:w:/var/sota/arduino-usb//firmware-arduino.bin:i");
         std::cout << "\n\nExiting, see you next time! \n\n\n";
+      } else if (command == "fullupdatecycle") {
+        // Perform automatically a full update cycle
+        
+        // CheckUpdates
+        auto result = aktualizr.CheckUpdates().get();
+        current_updates = result.updates;
+        
+        // Download
+        aktualizr.Download(current_updates).get();
+        
+        //Install
+        hashfirmwarearduino_old = exec("md5sum /var/sota/arduino-usb/firmware-arduino.bin");
+        aktualizr.Install(current_updates).get();
+        current_updates.clear();
+        hashfirmwarearduino_new = exec("md5sum /var/sota/arduino-usb/firmware-arduino.bin");
+        if (hashfirmwarearduino_old == hashfirmwarearduino_new) {
+            std::cout << "No updates for Arduino secondary to be installed" << std::endl;
+        }
+        else {
+            std::cout << "Starting installation for Arduino secondary...\n" << std::endl;
+            system("avrdude -v -p atmega328p -c arduino -P /dev/ttyACM0 -b 115200 -D -U flash:w:/var/sota/arduino-usb//firmware-arduino.bin:i");
+            std::cout << "\nInstallation completed for Arduino secondary" << std::endl;
+        }
+        
+        // Force to check again for updates, since otherwise the update procedure is not complete on server side
+        auto result = aktualizr.CheckUpdates().get();
+        current_updates = result.updates;
       } else if (command == "pause") {
         aktualizr.Pause();
       } else if (command == "resume") {

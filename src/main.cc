@@ -227,7 +227,7 @@ int main(int argc, char *argv[]) {
         }
         
         // Force to check again for updates, since otherwise the update procedure is not complete on server side
-        auto result = aktualizr.CheckUpdates().get();
+        result = aktualizr.CheckUpdates().get();
         current_updates = result.updates;
       } else if (command == "pause") {
         aktualizr.Pause();

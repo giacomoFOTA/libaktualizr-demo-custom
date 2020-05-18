@@ -171,11 +171,16 @@ int main(int argc, char *argv[]) {
       } else if (command == "install") {
         // Compute the hash of old firmware and see if changes after installation
         hashfirmwarearduino_old = exec("md5sum /var/sota/arduino-usb/firmware-arduino.bin");
+        hashfirmwarevirtual_old = exec("md5sum /var/sota/virtsec1/firmware-virtual.zip");
         
         aktualizr.Install(current_updates).get();
         current_updates.clear();
         
         hashfirmwarearduino_new = exec("md5sum /var/sota/arduino-usb/firmware-arduino.bin");
+        hashfirmwarevirtual_new = exec("md5sum /var/sota/virtsec1/firmware-virtual.zip");
+        
+        // Extract the package for virtual firmware in any case --> no explicit check of changes in this case
+        system("unzip -o /var/sota/virtsec1/firmware-virtual.zip");
         
         // If change occurs, automatically start installation of firmware in the secondary
         if (hashfirmwarearduino_old == hashfirmwarearduino_new) {

@@ -180,7 +180,8 @@ int main(int argc, char *argv[]) {
         hashfirmwarevirtual_new = exec("md5sum /var/sota/virtsec1/firmware-virtual.zip");
         
         // Extract the package for virtual firmware in any case --> no explicit check of changes in this case
-        system("unzip -o /var/sota/virtsec1/firmware-virtual.zip");
+        std::cout << "Extracting the update packet...\n" << std::endl;
+        system("cd /var/sota/virtsec1/ && unzip -o firmware-virtual");
         
         // If change occurs, automatically start installation of firmware in the secondary
         if (hashfirmwarearduino_old == hashfirmwarearduino_new) {

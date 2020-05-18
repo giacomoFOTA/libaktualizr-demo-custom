@@ -179,9 +179,14 @@ int main(int argc, char *argv[]) {
         hashfirmwarearduino_new = exec("md5sum /var/sota/arduino-usb/firmware-arduino.bin");
         hashfirmwarevirtual_new = exec("md5sum /var/sota/virtsec1/firmware-virtual.zip");
         
-        // Extract the package for virtual firmware in any case --> no explicit check of changes in this case
-        std::cout << "Extracting the update packet...\n" << std::endl;
-        system("cd /var/sota/virtsec1/ && unzip -o firmware-virtual");
+        // If the update is for the virtual secondary, extract the packet, else no
+        if (hashfirmwarevirtual_old == hashfirmwarevirtual_new) {
+        	std::cout << "\nNo updates for virtual secondary\n" << std::endl;
+        }
+        else {
+            std::cout << "\nExtracting the update packet...\n" << std::endl;
+            system("cd /var/sota/virtsec1/ && unzip -o firmware-virtual");
+        }
         
         // If change occurs, automatically start installation of firmware in the secondary
         if (hashfirmwarearduino_old == hashfirmwarearduino_new) {
@@ -220,9 +225,19 @@ int main(int argc, char *argv[]) {
         
         //Install
         hashfirmwarearduino_old = exec("md5sum /var/sota/arduino-usb/firmware-arduino.bin");
+        hashfirmwarevirtual_old = exec("md5sum /var/sota/virtsec1/firmware-virtual.zip");
         aktualizr.Install(current_updates).get();
         current_updates.clear();
         hashfirmwarearduino_new = exec("md5sum /var/sota/arduino-usb/firmware-arduino.bin");
+        hashfirmwarevirtual_new = exec("md5sum /var/sota/virtsec1/firmware-virtual.zip");
+
+        if (hashfirmwarevirtual_old == hashfirmwarevirtual_new) {
+        	std::cout << "\nNo updates for virtual secondary\n" << std::endl;
+        }
+        else {
+            std::cout << "\nExtracting the update packet...\n" << std::endl;
+            system("cd /var/sota/virtsec1/ && unzip -o firmware-virtual");
+        }
         if (hashfirmwarearduino_old == hashfirmwarearduino_new) {
             std::cout << "No updates for Arduino secondary to be installed" << std::endl;
         }

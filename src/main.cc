@@ -154,7 +154,8 @@ int main(int argc, char *argv[]) {
     std::string hashfirmwarevirtual_new;
     std::string hashfirmwarearduino_old;
     std::string hashfirmwarearduino_new;
-    
+    std::string hashfirmwaredisplay_old;
+    std::string hashfirmwaredisplay_new;
     
     while (std::getline(std::cin, buffer)) {
       std::vector<std::string> words;

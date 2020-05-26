@@ -172,12 +172,14 @@ int main(int argc, char *argv[]) {
         // Compute the hash of old firmware and see if changes after installation
         hashfirmwarearduino_old = exec("md5sum /var/sota/arduino-usb/firmware-arduino.bin");
         hashfirmwarevirtual_old = exec("md5sum /var/sota/virtsec1/firmware-virtual.zip");
+        hashfirmwaredisplay_old = exec("md5sum /var/sota/displayecu/firmware-display.zip");
         
         aktualizr.Install(current_updates).get();
         current_updates.clear();
         
         hashfirmwarearduino_new = exec("md5sum /var/sota/arduino-usb/firmware-arduino.bin");
         hashfirmwarevirtual_new = exec("md5sum /var/sota/virtsec1/firmware-virtual.zip");
+        hashfirmwaredisplay_new = exec("md5sum /var/sota/displayecu/firmware-display.zip");
         
         // If the update is for the virtual secondary, extract the packet, else no
         if (hashfirmwarevirtual_old == hashfirmwarevirtual_new) {
@@ -188,6 +190,15 @@ int main(int argc, char *argv[]) {
             system("cd /var/sota/virtsec1/ && unzip -o firmware-virtual");
         }
         
+        // If the update is for the display ECU, extract the packet, else no
+        if (hashfirmwaredisplay_old == hashfirmwaredisplay_new) {
+        	std::cout << "\nNo updates for display ECU\n" << std::endl;
+        }
+        else {
+            std::cout << "\nExtracting the update packet for display ECU...\n" << std::endl;
+            system("cd /var/sota/displayecu/ && unzip -o firmware-display");
+        }
+                
         // If change occurs, automatically start installation of firmware in the secondary
         if (hashfirmwarearduino_old == hashfirmwarearduino_new) {
             std::cout << "No updates for Arduino secondary to be installed" << std::endl;
@@ -226,10 +237,12 @@ int main(int argc, char *argv[]) {
         //Install
         hashfirmwarearduino_old = exec("md5sum /var/sota/arduino-usb/firmware-arduino.bin");
         hashfirmwarevirtual_old = exec("md5sum /var/sota/virtsec1/firmware-virtual.zip");
+        hashfirmwaredisplay_old = exec("md5sum /var/sota/displayecu/firmware-display.zip");
         aktualizr.Install(current_updates).get();
         current_updates.clear();
         hashfirmwarearduino_new = exec("md5sum /var/sota/arduino-usb/firmware-arduino.bin");
         hashfirmwarevirtual_new = exec("md5sum /var/sota/virtsec1/firmware-virtual.zip");
+        hashfirmwaredisplay_new = exec("md5sum /var/sota/displayecu/firmware-display.zip");
 
         if (hashfirmwarevirtual_old == hashfirmwarevirtual_new) {
         	std::cout << "\nNo updates for virtual secondary\n" << std::endl;
@@ -237,6 +250,13 @@ int main(int argc, char *argv[]) {
         else {
             std::cout << "\nExtracting the update packet...\n" << std::endl;
             system("cd /var/sota/virtsec1/ && unzip -o firmware-virtual");
+        }
+        if (hashfirmwaredisplay_old == hashfirmwaredisplay_new) {
+        	std::cout << "\nNo updates for display ECU\n" << std::endl;
+        }
+        else {
+            std::cout << "\nExtracting the update packet for display ECU...\n" << std::endl;
+            system("cd /var/sota/displayecu/ && unzip -o firmware-display");
         }
         if (hashfirmwarearduino_old == hashfirmwarearduino_new) {
             std::cout << "No updates for Arduino secondary to be installed" << std::endl;

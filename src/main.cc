@@ -191,13 +191,14 @@ int main(int argc, char *argv[]) {
             system("cd /var/sota/virtsec1/ && unzip -o firmware-virtual");
         }
         
-        // If the update is for the display ECU, extract the packet, else no
+        // If the update is for the display ECU, extract the packet and install the update, else no
         if (hashfirmwaredisplay_old == hashfirmwaredisplay_new) {
         	std::cout << "\nNo updates for display ECU\n" << std::endl;
         }
         else {
             std::cout << "\nExtracting the update packet for display ECU...\n" << std::endl;
             system("cd /var/sota/displayecu/ && unzip -o firmware-display");
+            system("python3 /var/sota/displayecu/dashboard_update_routine.py");
         }
                 
         // If change occurs, automatically start installation of firmware in the secondary
@@ -258,6 +259,7 @@ int main(int argc, char *argv[]) {
         else {
             std::cout << "\nExtracting the update packet for display ECU...\n" << std::endl;
             system("cd /var/sota/displayecu/ && unzip -o firmware-display");
+            system("python3 /var/sota/displayecu/dashboard_update_routine.py");
         }
         if (hashfirmwarearduino_old == hashfirmwarearduino_new) {
             std::cout << "No updates for Arduino secondary to be installed" << std::endl;

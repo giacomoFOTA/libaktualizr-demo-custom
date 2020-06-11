@@ -176,7 +176,7 @@ int main(int argc, char *argv[]) {
         hashfirmwaredisplay_old = exec("md5sum /var/sota/displayecu/firmware-display.zip");
         
         aktualizr.Install(current_updates).get();
-        
+        current_updates.clear();
         
         hashfirmwarearduino_new = exec("md5sum /var/sota/arduino-usb/firmware-arduino.bin");
         hashfirmwarevirtual_new = exec("md5sum /var/sota/virtsec1/firmware-virtual.zip");
@@ -211,7 +211,6 @@ int main(int argc, char *argv[]) {
             std::cout << "\nInstallation completed for Arduino secondary" << std::endl;
         }
         
-        current_updates.clear();
         // Force to check again for updates, since otherwise the update procedure is not complete on server side
         auto result = aktualizr.CheckUpdates().get();
         current_updates = result.updates;       
@@ -242,7 +241,7 @@ int main(int argc, char *argv[]) {
         hashfirmwarevirtual_old = exec("md5sum /var/sota/virtsec1/firmware-virtual.zip");
         hashfirmwaredisplay_old = exec("md5sum /var/sota/displayecu/firmware-display.zip");
         aktualizr.Install(current_updates).get();
-        
+        current_updates.clear();
         hashfirmwarearduino_new = exec("md5sum /var/sota/arduino-usb/firmware-arduino.bin");
         hashfirmwarevirtual_new = exec("md5sum /var/sota/virtsec1/firmware-virtual.zip");
         hashfirmwaredisplay_new = exec("md5sum /var/sota/displayecu/firmware-display.zip");
@@ -271,7 +270,6 @@ int main(int argc, char *argv[]) {
             std::cout << "\nInstallation completed for Arduino secondary" << std::endl;
         }
         
-        current_updates.clear();
         // Force to check again for updates, since otherwise the update procedure is not complete on server side
         result = aktualizr.CheckUpdates().get();
         current_updates = result.updates;

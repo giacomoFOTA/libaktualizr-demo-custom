@@ -224,7 +224,7 @@ int main(int argc, char *argv[]) {
           std::cout << "Error. Specify the campaign ID" << std::endl;
         }
       } else if (command == "gethandle") {
-        for (auto& target : update_result.updates) {
+        for (auto& target : current_updates) {
           std::cout << "Installing file " << target.filename();
           auto handle = aktualizr.GetStoredTarget(target);
           std::cout << " " << handle;

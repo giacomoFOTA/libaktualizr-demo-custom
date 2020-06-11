@@ -226,8 +226,8 @@ int main(int argc, char *argv[]) {
       } else if (command == "gethandle") {
         for (auto& target : current_updates) {
           std::cout << "Installing file " << target.filename();
-          auto handle = aktualizr.GetStoredTarget(target);
-          std::cout << " " << handle;
+          auto handle = aktualizr.OpenStoredTarget(target);
+          //custom_install(handle);
         }
       } else if (command == "secarduinoinstall") {
         std::cout << "Starting flash for Arduino with AVRdude\n\n\n";

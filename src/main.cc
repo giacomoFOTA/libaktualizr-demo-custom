@@ -223,6 +223,12 @@ int main(int argc, char *argv[]) {
         } else {
           std::cout << "Error. Specify the campaign ID" << std::endl;
         }
+      } else if (command == "gethandle") {
+        for (auto& target : update_result.updates) {
+          std::cout << "Installing file " << target.filename();
+          auto handle = aktualizr.GetStoredTarget(target);
+          std::cout << " " << handle;
+        }
       } else if (command == "secarduinoinstall") {
         std::cout << "Starting flash for Arduino with AVRdude\n\n\n";
         system("avrdude -v -p atmega328p -c arduino -P /dev/ttyACM0 -b 115200 -D -U flash:w:/var/sota/arduino-usb//firmware-arduino.bin:i");
